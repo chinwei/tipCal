@@ -13,7 +13,9 @@ import {
   TextInput,
   Slider,
   TouchableHighlight,
-  StatusBar
+  StatusBar,
+  Animated,
+  Easing
 } from 'react-native';
 
 class tipCal extends Component {
@@ -121,17 +123,78 @@ class NumPadKey extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {}
+
+    this.state = {
+      fontSize: 14,
+      fontPos: new Animated.Value(0),
+      fontSizeAnim: new Animated.Value(14)
+    }
 
   }
 
 
+onPress() {
+
+  this.props.appendNumber();
+
+
+
+
+  // console.log(this.props.appendNumber);
+
+
+}
+
+onPressIn() {
+
+  Animated.timing(          // Uses easing functions
+     this.state.fontSizeAnim,    // The value to drive
+     {
+        toValue: 28,
+        duration: 200,
+        easing: Easing.elastic(1)
+   }).start();
+
+   Animated.timing(          // Uses easing functions
+      this.state.fontPos,    // The value to drive
+      {
+         toValue: 20,
+         duration: 200,
+         easing: Easing.elastic(1)
+    }).start();
+   }
+
+onPressOut() {
+  Animated.timing(          // Uses easing functions
+     this.state.fontSizeAnim,    // The value to drive
+     {toValue: 14,
+       duration: 200,
+       easing: Easing.elastic(2)
+     }            // Configuration
+   ).start();
+
+   Animated.timing(          // Uses easing functions
+      this.state.fontPos,    // The value to drive
+      {
+         toValue: 0,
+         duration: 200,
+         easing: Easing.elastic(2)
+    }).start();
+}
+
 
   render() {
     return (
-      <TouchableHighlight style={{flex:1}} onPress={() => this.props.appendNumber()} underlayColor="#f3f3f3">
+      <TouchableHighlight
+          style={{flex:1}}
+          onPress={() => this.props.appendNumber()}
+          onShowUnderlay={() => this.onPressIn()}
+          onHideUnderlay={() => this.onPressOut()}
+          underlayColor="transparent">
         <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-          <Text>{this.props.text}</Text>
+          <Animated.Text style={{fontSize: this.state.fontSizeAnim, position: 'relative', bottom: this.state.fontPos}}>
+            {this.props.text}
+          </Animated.Text>
         </View>
       </TouchableHighlight>
     )
